@@ -10,7 +10,6 @@ interface GameViewProps {
   soundEnabled: boolean;
   onFinish: (stats: GameStats) => void;
   onExit: () => void;
-  isActive: boolean;
 }
 
 const GameView: React.FC<GameViewProps> = ({
@@ -30,6 +29,7 @@ const GameView: React.FC<GameViewProps> = ({
     isPaused,
     setIsPaused,
     handleCardClick,
+    isActive,
   } = useMemoryGame(mode, theme, onFinish, soundEnabled);
 
   return (

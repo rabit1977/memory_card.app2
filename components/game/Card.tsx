@@ -43,7 +43,7 @@ const Card: React.FC<CardProps> = ({
             WebkitBackfaceVisibility: 'hidden',
           }}
         >
-          <div className='absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity' />
+          <div className='absolute inset-0 bg-linear-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity' />
           <Brain className='text-slate-600 w-1/3 h-1/3' strokeWidth={1.5} />
         </div>
 

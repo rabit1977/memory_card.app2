@@ -14,7 +14,7 @@ const VictoryView: React.FC<{
     </div>
     <h1 className='text-4xl font-bold text-white mb-2'>Level Complete!</h1>
     <p className='text-slate-400 mb-2'>Excellent memory work, {user?.name}!</p>
-    <div className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-8'>
+    <div className='text-3xl font-bold text-transparent bg-clip-text bg-linear-to-r from-yellow-400 to-orange-500 mb-8'>
       Score: {stats?.score || 0}
     </div>
 

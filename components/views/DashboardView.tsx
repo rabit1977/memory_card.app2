@@ -1,21 +1,21 @@
 import { MODES } from '@/lib/constants';
-import { User, GameStats, ThemeKey, GameMode } from '@/types/types';
+import { GameMode, GameStats, ThemeKey, User } from '@/types/types';
 import {
+  CheckCircle2,
+  ChevronLeft,
+  Gamepad2,
+  History,
+  LogOut,
+  Palette,
+  Play,
+  Sparkles,
   Trophy,
   Volume2,
   VolumeX,
-  LogOut,
-  Gamepad2,
-  CheckCircle2,
-  Sparkles,
-  Palette,
-  Play,
-  ChevronLeft,
-  LucideIcon,
-  History,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import Button from '../ui/Button';
+import { StatCard } from '../ui/StatCard';
 
 interface DashboardProps {
   user: User;
@@ -50,7 +50,7 @@ const DashboardView: React.FC<DashboardProps> = ({
     <div className='max-w-5xl mx-auto w-full p-4 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
       <header className='flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md'>
         <div className='flex items-center gap-4'>
-          <div className='w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-lg font-bold text-white shadow-lg'>
+          <div className='w-12 h-12 rounded-full bg-linear-to-r from-pink-500 to-rose-500 flex items-center justify-center text-lg font-bold text-white shadow-lg'>
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div>
@@ -132,7 +132,7 @@ const DashboardView: React.FC<DashboardProps> = ({
                 onClick={() => onStartGame(mode)}
                 className='group relative overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/50 p-6 text-left transition-all hover:border-indigo-500 hover:bg-slate-800'
               >
-                <div className='absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
+                <div className='absolute inset-0 bg-linear-to-br from-indigo-600/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
                 <div className='relative z-10'>
                   <h4 className='text-lg font-bold text-slate-100 mb-1'>
                     {mode.name}
@@ -164,7 +164,7 @@ const DashboardView: React.FC<DashboardProps> = ({
                   .slice(0, 3)
                   .map((game, idx) => (
                     <div
-                      key={idx}
+                      key={game.date || idx}
                       className='flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50'
                     >
                       <div className='flex items-center gap-3'>
@@ -238,21 +238,4 @@ const DashboardView: React.FC<DashboardProps> = ({
   );
 };
 
-const StatCard: React.FC<{
-  icon: LucideIcon;
-  label: string;
-  value: string | number;
-  highlight?: boolean;
-}> = ({ icon: Icon, label, value, highlight = false }) => (
-  <div
-    className={`flex flex-col items-center p-3 rounded-xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm ${
-      highlight ? 'ring-1 ring-indigo-500/50 bg-indigo-500/10' : ''
-    }`}
-  >
-    <div className='text-slate-400 text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1'>
-      <Icon size={12} /> {label}
-    </div>
-    <div className='text-xl font-bold text-slate-100'>{value}</div>
-  </div>
-);
 export default DashboardView;

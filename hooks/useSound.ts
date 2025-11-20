@@ -1,5 +1,9 @@
 import { useCallback } from 'react';
 
+interface WindowWithAudioContext extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 const useSound = (enabled: boolean = true) => {
   const playTone = useCallback(
     (freq: number, type: OscillatorType, duration: number, delay = 0) => {
@@ -7,7 +11,8 @@ const useSound = (enabled: boolean = true) => {
 
       try {
         const AudioContext =
-          window.AudioContext || (window as any).webkitAudioContext;
+          window.AudioContext ||
+          (window as WindowWithAudioContext).webkitAudioContext;
         if (!AudioContext) return;
 
         const ctx = new AudioContext();
@@ -35,17 +40,20 @@ const useSound = (enabled: boolean = true) => {
     [enabled]
   );
 
-  const playFlip = () => playTone(400, 'sine', 0.1);
-  const playMatch = () => {
+  const playFlip = useCallback(() => playTone(400, 'sine', 0.1), [playTone]);
+  const playMatch = useCallback(() => {
     playTone(600, 'sine', 0.1, 0);
     playTone(800, 'sine', 0.2, 0.1);
-  };
-  const playWin = () => {
+  }, [playTone]);
+  const playWin = useCallback(() => {
     [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
       playTone(freq, 'triangle', 0.3, i * 0.15);
     });
-  };
-  const playError = () => playTone(150, 'sawtooth', 0.3);
+  }, [playTone]);
+  const playError = useCallback(
+    () => playTone(150, 'sawtooth', 0.3),
+    [playTone]
+  );
 
   return { playFlip, playMatch, playWin, playError };
 };

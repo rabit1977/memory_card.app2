@@ -6,33 +6,59 @@ import LoginView from '@/components/views/LoginView';
 import VictoryView from '@/components/views/VictoryView';
 import { MODES, STORAGE_KEYS } from '@/lib/constants';
 import { GameMode, GameStats, ThemeKey, User, ViewState } from '@/types/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 const App: React.FC = () => {
   // Global State
-  const [user, setUser] = useState<User | null>(null);
-  const [history, setHistory] = useState<GameStats[]>([]);
-  const [currentView, setCurrentView] = useState<ViewState>('login');
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error('Failed to parse user from localStorage', error);
+      return null;
+    }
+  });
+  const [history, setHistory] = useState<GameStats[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const storedScores = localStorage.getItem(STORAGE_KEYS.SCORES);
+      return storedScores ? JSON.parse(storedScores) : [];
+    } catch (error) {
+      console.error('Failed to parse scores from localStorage', error);
+      return [];
+    }
+  });
+  const [currentView, setCurrentView] = useState<ViewState>(() => {
+    if (typeof window === 'undefined') return 'login';
+    try {
+      const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
+      return storedUser ? 'dashboard' : 'login';
+    } catch (error) {
+      console.error('Failed to determine view from localStorage', error);
+      return 'login';
+    }
+  });
   const [gameMode, setGameMode] = useState<GameMode>(MODES.easy);
-  const [theme, setTheme] = useState<ThemeKey>('classic');
+  const [theme, setTheme] = useState<ThemeKey>(() => {
+    if (typeof window === 'undefined') return 'classic';
+    try {
+      const storedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
+      return storedTheme ? (storedTheme as ThemeKey) : 'classic';
+    } catch (error) {
+      console.error('Failed to parse theme from localStorage', error);
+      return 'classic';
+    }
+  });
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [lastGameStats, setLastGameStats] = useState<GameStats | null>(null);
-
-  // Hydration from LocalStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const storedScores = localStorage.getItem(STORAGE_KEYS.SCORES);
-    const storedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
-
-    if (storedUser) setUser(JSON.parse(storedUser));
-    if (storedScores) setHistory(JSON.parse(storedScores));
-    if (storedTheme) setTheme(storedTheme as ThemeKey);
-  }, []);
 
   // Handlers
   const handleLogin = (userData: User) => {
     setUser(userData);
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+    setCurrentView('dashboard');
   };
 
   const handleLogout = () => {
@@ -46,30 +72,24 @@ const App: React.FC = () => {
     localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
   };
 
-  // Navigation Control
-  useEffect(() => {
-    if (user) {
-      if (currentView === 'login') setCurrentView('dashboard');
-    } else {
-      setCurrentView('login');
-    }
-  }, [user, currentView]);
-
   const startGame = (mode: GameMode) => {
     setGameMode(mode);
     setCurrentView('game');
   };
 
-  const handleGameFinish = (stats: GameStats) => {
-    const newHistory = [
-      ...history,
-      { ...stats, date: new Date().toISOString() },
-    ];
-    setHistory(newHistory);
-    localStorage.setItem(STORAGE_KEYS.SCORES, JSON.stringify(newHistory));
-    setLastGameStats(stats);
-    setCurrentView('win');
-  };
+  const handleGameFinish = useCallback(
+    (stats: GameStats) => {
+      const newHistory = [
+        ...history,
+        { ...stats, date: new Date().toISOString() },
+      ];
+      setHistory(newHistory);
+      localStorage.setItem(STORAGE_KEYS.SCORES, JSON.stringify(newHistory));
+      setLastGameStats(stats);
+      setCurrentView('win');
+    },
+    [history]
+  );
 
   return (
     <div className='min-h-screen bg-[#0B1120] text-slate-200 font-sans selection:bg-indigo-500/30'>

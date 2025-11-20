@@ -1,15 +1,32 @@
 import { CARD_THEMES } from '@/lib/constants';
-import { GameMode, ThemeKey, GameStats, CardItem } from '@/types/types';
-import { useState, useEffect } from 'react';
+import { CardItem, GameMode, GameStats, ThemeKey } from '@/types/types';
+import { useCallback, useEffect, useState } from 'react';
 import useSound from './useSound';
 
+const generateDeck = (mode: GameMode, themeKey: ThemeKey): CardItem[] => {
+  const theme = CARD_THEMES[themeKey];
+  const totalPairs = mode.pairs;
+  const icons = [...theme];
+  const selectedEmojis = icons
+    .sort(() => 0.5 - Math.random())
+    .slice(0, totalPairs);
+
+  return [...selectedEmojis, ...selectedEmojis]
+    .sort(() => 0.5 - Math.random())
+    .map((emoji, index) => ({
+      id: index,
+      content: emoji,
+    }));
+};
 export const useMemoryGame = (
   mode: GameMode,
   themeKey: ThemeKey,
   onGameFinish: (stats: GameStats) => void,
   soundEnabled: boolean
 ) => {
-  const [cards, setCards] = useState<CardItem[]>([]);
+  const [cards, setCards] = useState<CardItem[]>(() =>
+    generateDeck(mode, themeKey)
+  );
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
   const [moves, setMoves] = useState<number>(0);
@@ -19,24 +36,8 @@ export const useMemoryGame = (
 
   const { playFlip, playMatch, playWin } = useSound(soundEnabled);
 
-  // Initialization
-  useEffect(() => {
-    const theme = CARD_THEMES[themeKey];
-    const totalPairs = mode.pairs;
-    // Ensure we don't run out of icons if difficulty is high
-    const icons = [...theme];
-    const selectedEmojis = icons
-      .sort(() => 0.5 - Math.random())
-      .slice(0, totalPairs);
-
-    const deck = [...selectedEmojis, ...selectedEmojis]
-      .sort(() => 0.5 - Math.random())
-      .map((emoji, index) => ({
-        id: index,
-        content: emoji,
-      }));
-
-    setCards(deck);
+  const resetGame = useCallback(() => {
+    setCards(generateDeck(mode, themeKey));
     setFlipped([]);
     setMatched([]);
     setMoves(0);
@@ -44,6 +45,12 @@ export const useMemoryGame = (
     setIsActive(true);
     setIsPaused(false);
   }, [mode, themeKey]);
+
+  // Reset game when mode or theme changes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    resetGame();
+  }, [resetGame]);
 
   // Timer
   useEffect(() => {
@@ -102,16 +109,17 @@ export const useMemoryGame = (
   }, [matched, cards, moves, time, onGameFinish, mode, playWin]);
 
   const handleCardClick = (id: number) => {
-    if (isPaused || !isActive || matched.includes(id) || flipped.includes(id))
+    if (
+      isPaused ||
+      !isActive ||
+      matched.includes(id) ||
+      flipped.includes(id) ||
+      flipped.length === 2
+    )
       return;
 
     playFlip();
-
-    if (flipped.length === 2) {
-      setFlipped([id]); // Fluid play: auto-reset old ones
-    } else {
-      setFlipped((prev) => [...prev, id]);
-    }
+    setFlipped((prev) => [...prev, id]);
   };
 
   return {
@@ -124,7 +132,6 @@ export const useMemoryGame = (
     setIsPaused,
     handleCardClick,
     isActive,
-    setIsActive,
   };
 };
 

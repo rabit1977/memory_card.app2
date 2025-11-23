@@ -18,6 +18,7 @@ const generateDeck = (mode: GameMode, themeKey: ThemeKey): CardItem[] => {
       content: emoji,
     }));
 };
+
 export const useMemoryGame = (
   mode: GameMode,
   themeKey: ThemeKey,

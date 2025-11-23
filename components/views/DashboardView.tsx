@@ -48,7 +48,7 @@ const DashboardView: React.FC<DashboardProps> = ({
 
   return (
     <div className='max-w-5xl mx-auto w-full p-4 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
-      <header className='flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-xl shadow-lg shadow-indigo-500/10'>
         <div className='flex items-center gap-4'>
           <div className='w-12 h-12 rounded-full bg-linear-to-r from-pink-500 to-rose-500 flex items-center justify-center text-lg font-bold text-white shadow-lg'>
             {user.name.charAt(0).toUpperCase()}
@@ -76,7 +76,7 @@ const DashboardView: React.FC<DashboardProps> = ({
             Sign Out
           </Button>
         </div>
-      </header>
+      </div>
 
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         <StatCard icon={Gamepad2} label='Games Played' value={stats.games} />

@@ -1,6 +1,6 @@
 import { User } from '@/types/types';
-import { Brain, XCircle, Play } from 'lucide-react';
-import { useState, FormEvent } from 'react';
+import { Brain, Play, XCircle } from 'lucide-react';
+import { FormEvent, useState } from 'react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
@@ -12,6 +12,7 @@ const LoginView: React.FC<{ onLogin: (user: User) => void }> = ({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    console.log('Submitting login with name:', name);
     if (!name.trim()) {
       setError('Please enter your name to start.');
       return;
